@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Choose a Tutor — Learning With Samara Tutors</title>
+<style>
+  :root{
+    --navy-deep:#0F0C29; --navy-mid:#1B1547; --purple:#302B63;
+    --gold:#FFC93C; --gold-soft:#FFE9A8;
+    --ink:#F3F1FF; --ink-dim:#B9B4E0;
+    --font-display:'Baloo 2','Segoe UI',system-ui,sans-serif;
+    --font-body:'Nunito','Segoe UI',system-ui,sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap');
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:var(--font-body);
+    background:radial-gradient(ellipse at top, var(--navy-mid), var(--navy-deep) 70%);
+    color:var(--ink);
+    padding: max(20px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom));
+  }
+  .wrap{ max-width: 720px; margin: 0 auto; }
+  .back-link{ display:inline-block; font-size:13px; color:var(--ink-dim); text-decoration:none; margin-bottom:24px; }
+  h1{ font-family:var(--font-display); font-weight:800; font-size:clamp(26px,5vw,36px); margin:0 0 8px; }
+  .sub{ color:var(--ink-dim); font-size:16px; margin:0 0 32px; }
+
+  .tutor-card{
+    display:flex; gap:20px; align-items:flex-start;
+    background:linear-gradient(160deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.12); border-radius:22px; padding:24px;
+    margin-bottom:18px; flex-wrap:wrap;
+  }
+  .avatar{
+    width:64px; height:64px; border-radius:50%; flex-shrink:0;
+    background:linear-gradient(135deg,var(--gold),#FF9F43);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-display); font-weight:800; font-size:24px; color:var(--navy-deep);
+  }
+  .tutor-info{ flex:1; min-width:180px; }
+  .tutor-info h2{ font-family:var(--font-display); font-size:19px; margin:0 0 4px; }
+  .cert-badge{
+    display:inline-block; font-size:11.5px; font-weight:700; color:var(--navy-deep);
+    background:var(--gold); border-radius:999px; padding:3px 10px; margin-bottom:8px;
+  }
+  .tutor-info p{ color:var(--ink-dim); font-size:14px; line-height:1.55; margin:0 0 10px; }
+  .tags{ display:flex; gap:6px; flex-wrap:wrap; }
+  .tag{ font-size:11.5px; background:rgba(255,255,255,.08); border-radius:999px; padding:4px 10px; color:var(--ink-dim); }
+
+  .choose-btn{
+    display:inline-block; text-decoration:none; font-family:var(--font-display); font-weight:700;
+    font-size:14px; color:var(--navy-deep); background:linear-gradient(135deg,var(--gold),#FF9F43);
+    padding:11px 22px; border-radius:12px; margin-top:14px; width:100%; text-align:center;
+    box-shadow:0 6px 16px rgba(255,159,67,.3);
+  }
+
+  .empty-note{
+    text-align:center; color:var(--ink-dim); font-size:14px; margin-top:20px; padding: 20px;
+    border:1px dashed rgba(255,255,255,.15); border-radius:16px;
+  }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back-link" href="index.html">← Back</a>
+    <h1>Choose a Tutor</h1>
+    <p class="sub">Pick who you'd like your child's free placement call with.</p>
+
+    <div id="tutor-list"></div>
+    <div id="empty-state" class="empty-note" style="display:none;">
+      No tutors available right now — check back soon!
+    </div>
+  </div>
+
+  <script>
+    // Tutor data — for now this is a static array (matches the `tutors` table structure).
+    // Once you're pulling from Supabase directly, replace this with a fetch() to the `tutors` table.
+    const tutors = [
+      {
+        id: "REPLACE_WITH_REAL_TUTOR_UUID_FROM_SUPABASE", // the id column from your tutors table row
+        full_name: "Sasha-Gaye Hemmings",
+        initials: "SH",
+        certifications: "TESOL Certified",
+        bio: "Founder of Learning With Samara AI. Focused on building confidence through conversational English practice.",
+        age_bands: ["Ages 7–10", "Ages 11–17"],
+        languages: ["English"]
+      }
+      // Add more tutors here later, same shape.
+    ];
+
+    const list = document.getElementById('tutor-list');
+    const empty = document.getElementById('empty-state');
+
+    if (tutors.length === 0) {
+      empty.style.display = 'block';
+    } else {
+      tutors.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'tutor-card';
+        card.innerHTML = `
+          <div class="avatar">${t.initials}</div>
+          <div class="tutor-info">
+            <h2>${t.full_name}</h2>
+            <span class="cert-badge">${t.certifications}</span>
+            <p>${t.bio}</p>
+            <div class="tags">
+              ${t.age_bands.map(a => `<span class="tag">${a}</span>`).join('')}
+              ${t.languages.map(l => `<span class="tag">${l}</span>`).join('')}
+            </div>
+            <a class="choose-btn" href="pick-a-time.html?tutor_id=${t.id}&type=placement">
+              Book Free Placement Call →
+            </a>
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
