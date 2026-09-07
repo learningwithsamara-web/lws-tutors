@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Availability — Admin</title>
+<style>
+  :root{
+    --navy-deep:#0F0C29; --navy-mid:#1B1547;
+    --gold:#FFC93C; --coral:#FF6B6B; --green:#4ADE80;
+    --ink:#F3F1FF; --ink-dim:#B9B4E0;
+    --font-display:'Baloo 2','Segoe UI',system-ui,sans-serif;
+    --font-body:'Nunito','Segoe UI',system-ui,sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@700;800&family=Nunito:wght@400;600;700;800&display=swap');
+  *{box-sizing:border-box;}
+  body{
+    margin:0; font-family:var(--font-body);
+    background:radial-gradient(ellipse at top, var(--navy-mid), var(--navy-deep) 70%);
+    color:var(--ink); padding: 24px 20px 60px;
+  }
+  .wrap{ max-width: 680px; margin: 0 auto; }
+  h1{ font-family:var(--font-display); font-size:26px; margin:0 0 4px; }
+  .sub{ color:var(--ink-dim); font-size:14px; margin:0 0 28px; }
+
+  .card{
+    background:linear-gradient(160deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.1); border-radius:18px; padding:24px; margin-bottom:24px;
+  }
+  .card h2{ font-family:var(--font-display); font-size:17px; margin:0 0 16px; }
+
+  label{ display:block; font-size:13px; color:var(--ink-dim); margin-bottom:5px; font-weight:700; }
+  input, select{
+    width:100%; padding:10px 12px; border-radius:9px; border:1px solid rgba(255,255,255,.15);
+    background:rgba(255,255,255,.04); color:var(--ink); font-family:var(--font-body); font-size:14px;
+    margin-bottom:14px;
+  }
+  .row{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+
+  .btn{
+    border:none; cursor:pointer; font-family:var(--font-display); font-weight:700; font-size:14px;
+    color:var(--navy-deep); background:linear-gradient(135deg,var(--gold),#FF9F43);
+    padding:12px 20px; border-radius:12px; width:100%;
+  }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+  .status{ margin-top:12px; padding:10px 14px; border-radius:10px; font-size:13.5px; }
+  .status.error{ background:rgba(255,107,107,.12); color:#FFB3B3; }
+  .status.success{ background:rgba(74,222,128,.12); color:var(--green); }
+
+  table{ width:100%; border-collapse:collapse; font-size:13.5px; }
+  th{ text-align:left; color:var(--ink-dim); font-weight:700; padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.1); }
+  td{ padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.06); }
+  .badge{ font-size:11px; padding:2px 8px; border-radius:999px; font-weight:700; }
+  .badge.open{ background:rgba(74,222,128,.15); color:var(--green); }
+  .badge.booked{ background:rgba(255,107,107,.15); color:#FFB3B3; }
+  .del-btn{ background:none; border:none; color:var(--coral); cursor:pointer; font-size:13px; }
+
+  .lock-screen{ text-align:center; padding-top:80px; }
+  .lock-screen input{ max-width:240px; margin: 12px auto; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div id="lock-screen" class="lock-screen">
+      <h1>🔒 Admin Access</h1>
+      <p class="sub">Enter your admin passcode to manage availability.</p>
+      <input type="password" id="passcode-input" placeholder="Passcode">
+      <button class="btn" onclick="checkPasscode()" style="max-width:240px; margin: 0 auto;">Enter</button>
+      <div id="lock-status"></div>
+    </div>
+
+    <div id="admin-content" style="display:none;">
+      <h1>Manage Availability</h1>
+      <p class="sub">Add new open slots, or remove ones you no longer want to offer.</p>
+
+      <div class="card">
+        <h2>Add a New Slot</h2>
+        <div class="row">
+          <div>
+            <label>Date</label>
+            <input type="date" id="slot-date">
+          </div>
+          <div>
+            <label>Start Time (your local time)</label>
+            <input type="time" id="slot-time">
+          </div>
+        </div>
+        <label>Session Type</label>
+        <select id="session-type">
+          <option value="placement">Free Placement Call (15 min)</option>
+          <option value="weekly">Weekly Session — Explorer (25 min)</option>
+          <option value="weekly">Weekly Session — Pro/Senior (45 min)</option>
+        </select>
+        <button class="btn" id="add-slot-btn" onclick="addSlot()">Add Slot</button>
+        <div id="add-status"></div>
+      </div>
+
+      <div class="card">
+        <h2>Upcoming Slots</h2>
+        <table>
+          <thead>
+            <tr><th>Date & Time</th><th>Type</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody id="slots-table-body">
+            <tr><td colspan="4">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- CONFIGURATION ----
+    const SUPABASE_URL = "https://bfivpvlzehtmksnmgnzb.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJmaXZwdmx6ZWh0bWtzbm1nbnpiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMzNDEzODgsImV4cCI6MjA4ODkxNzM4OH0.HJ2iITuM4y0fxdIeMM23wW-AkkUg16oKT9CkLBHl3dk";
+    const TUTOR_ID = "e98150d9-203f-4b31-9d06-08c96a736bcb"; // Sasha-Gaye Hemmings
+    const ADMIN_PASSCODE = "CHANGE_ME_TO_A_REAL_Apriljune314"; // simple gate — not real security, see note below
+    // ------------------------
+
+    function checkPasscode() {
+      const entered = document.getElementById('passcode-input').value;
+      if (entered === ADMIN_PASSCODE) {
+        document.getElementById('lock-screen').style.display = 'none';
+        document.getElementById('admin-content').style.display = 'block';
+        loadSlots();
+      } else {
+        document.getElementById('lock-status').innerHTML = '<div class="status error">Incorrect passcode.</div>';
+      }
+    }
+
+    async function addSlot() {
+      const date = document.getElementById('slot-date').value;
+      const time = document.getElementById('slot-time').value;
+      const sessionType = document.getElementById('session-type').value;
+      const statusEl = document.getElementById('add-status');
+
+      if (!date || !time) {
+        statusEl.innerHTML = '<div class="status error">Please pick a date and time.</div>';
+        return;
+      }
+
+      const durationMinutes = sessionType === 'placement' ? 15 : 30; // adjust weekly duration as needed
+      const start = new Date(`${date}T${time}:00`);
+      const end = new Date(start.getTime() + durationMinutes * 60000);
+
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/tutor_availability`, {
+        method: 'POST',
+        headers: {
+          apikey: SUPABASE_ANON_KEY,
+          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          'Content-Type': 'application/json',
+          Prefer: 'return=representation',
+        },
+        body: JSON.stringify({
+          tutor_id: TUTOR_ID,
+          slot_start: start.toISOString(),
+          slot_end: end.toISOString(),
+          session_type: sessionType,
+        }),
+      });
+
+      if (res.ok) {
+        statusEl.innerHTML = '<div class="status success">Slot added!</div>';
+        document.getElementById('slot-date').value = '';
+        document.getElementById('slot-time').value = '';
+        loadSlots();
+      } else {
+        const err = await res.text();
+        statusEl.innerHTML = `<div class="status error">Failed to add slot: ${err}</div>`;
+      }
+    }
+
+    async function loadSlots() {
+      const tbody = document.getElementById('slots-table-body');
+      const res = await fetch(
+        `${SUPABASE_URL}/rest/v1/tutor_availability?tutor_id=eq.${TUTOR_ID}&order=slot_start.asc`,
+        { headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` } }
+      );
+      const slots = await res.json();
+
+      if (!Array.isArray(slots) || slots.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4">No slots yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = slots.map(slot => {
+        const dt = new Date(slot.slot_start).toLocaleString(undefined, {
+          weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit'
+        });
+        const badgeClass = slot.is_booked ? 'booked' : 'open';
+        const badgeText = slot.is_booked ? 'Booked' : 'Open';
+        return `
+          <tr>
+            <td>${dt}</td>
+            <td>${slot.session_type}</td>
+            <td><span class="badge ${badgeClass}">${badgeText}</span></td>
+            <td>${slot.is_booked ? '' : `<button class="del-btn" onclick="deleteSlot('${slot.id}')">Remove</button>`}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function deleteSlot(id) {
+      if (!confirm('Remove this slot?')) return;
+      await fetch(`${SUPABASE_URL}/rest/v1/tutor_availability?id=eq.${id}`, {
+        method: 'DELETE',
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: `Bearer ${SUPABASE_ANON_KEY}` },
+      });
+      loadSlots();
+    }
+  </script>
+</body>
+</html>
