@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Free English Placement Call — Learning With Samara</title>
+<style>
+  :root{
+    --navy-deep:#0F0C29;
+    --navy-mid:#1B1547;
+    --purple:#302B63;
+    --gold:#FFC93C;
+    --gold-soft:#FFE9A8;
+    --coral:#FF6B6B;
+    --ink:#F3F1FF;
+    --ink-dim:#B9B4E0;
+    --font-display:'Baloo 2','Segoe UI',system-ui,sans-serif;
+    --font-body:'Nunito','Segoe UI',system-ui,sans-serif;
+  }
+  @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800&display=swap');
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:var(--font-body);
+    background:radial-gradient(ellipse at top, var(--navy-mid), var(--navy-deep) 70%);
+    color:var(--ink);
+    min-height:100vh;
+    padding: max(24px, env(safe-area-inset-top)) 20px max(40px, env(safe-area-inset-bottom));
+  }
+
+  .wrap{ max-width: 760px; margin: 0 auto; }
+
+  /* stars background */
+  .stars{
+    position:fixed; inset:0; z-index:-1; overflow:hidden;
+  }
+  .star{
+    position:absolute; width:3px; height:3px; background:var(--gold-soft);
+    border-radius:50%; opacity:.6; animation: twinkle 3.5s ease-in-out infinite;
+  }
+  @keyframes twinkle{ 0%,100%{opacity:.2} 50%{opacity:.9} }
+
+  header{ text-align:center; margin-bottom: 36px; }
+  .eyebrow{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:var(--font-display); font-weight:700; font-size:13px;
+    letter-spacing:.08em; text-transform:uppercase;
+    color:var(--gold); background:rgba(255,201,60,.1);
+    border:1px solid rgba(255,201,60,.3); border-radius:999px;
+    padding:6px 16px; margin-bottom:18px;
+  }
+  h1{
+    font-family:var(--font-display); font-weight:800;
+    font-size:clamp(28px,5vw,42px); line-height:1.15; margin:0 0 14px;
+  }
+  h1 span{ color:var(--gold); }
+  .sub{ color:var(--ink-dim); font-size:17px; max-width:520px; margin:0 auto; line-height:1.55; }
+
+  /* signature: the 8-week starpath, condensed to show the free step first */
+  .starpath{
+    display:flex; align-items:center; justify-content:center;
+    gap:6px; margin:38px 0 34px; flex-wrap:wrap;
+  }
+  .node{
+    display:flex; flex-direction:column; align-items:center; gap:8px; position:relative;
+  }
+  .dot{
+    width:44px; height:44px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    font-size:18px; font-weight:800; font-family:var(--font-display);
+  }
+  .dot.free{
+    background:linear-gradient(135deg,var(--gold),#FF9F43);
+    color:var(--navy-deep); box-shadow:0 0 0 5px rgba(255,201,60,.18), 0 0 24px rgba(255,201,60,.5);
+  }
+  .dot.locked{
+    background:rgba(255,255,255,.06); color:var(--ink-dim);
+    border:1.5px dashed rgba(255,255,255,.25);
+  }
+  .node-label{ font-size:11px; color:var(--ink-dim); text-align:center; max-width:64px; }
+  .connector{ width:26px; height:2px; background:repeating-linear-gradient(90deg,rgba(255,255,255,.25) 0 6px, transparent 6px 10px); margin-bottom:26px; }
+
+  /* card */
+  .card{
+    background:linear-gradient(160deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:24px; padding:32px 28px; backdrop-filter: blur(6px);
+  }
+  .card h2{
+    font-family:var(--font-display); font-size:22px; margin:0 0 6px;
+  }
+  .card .price-tag{
+    display:inline-block; font-family:var(--font-display); font-weight:800;
+    color:var(--navy-deep); background:var(--gold); border-radius:999px;
+    padding:3px 12px; font-size:13px; margin-bottom:16px;
+  }
+
+  ul.details{ list-style:none; padding:0; margin: 18px 0 26px; }
+  ul.details li{
+    display:flex; gap:10px; padding:9px 0; color:var(--ink-dim); font-size:15px;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+  ul.details li:last-child{ border-bottom:none; }
+  ul.details li b{ color:var(--ink); font-weight:700; }
+  ul.details .icon{ flex-shrink:0; width:20px; text-align:center; }
+
+  .fine{
+    font-size:13px; color:var(--ink-dim); line-height:1.6; margin-bottom:26px;
+  }
+  .fine b{ color:var(--gold-soft); }
+
+  .cta{
+    display:block; width:100%; text-align:center; text-decoration:none;
+    font-family:var(--font-display); font-weight:700; font-size:17px;
+    color:var(--navy-deep); background:linear-gradient(135deg,var(--gold),#FF9F43);
+    padding:16px; border-radius:16px; border:none; cursor:pointer;
+    box-shadow:0 8px 24px rgba(255,159,67,.35);
+    transition: transform .15s ease;
+  }
+  .cta:hover{ transform: translateY(-2px); }
+  .cta:focus-visible{ outline:3px solid var(--gold-soft); outline-offset:3px; }
+
+  .age-note{
+    text-align:center; margin-top:16px; font-size:13px; color:var(--ink-dim);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .star{ animation:none; opacity:.5; }
+    .cta{ transition:none; }
+  }
+</style>
+</head>
+<body>
+  <div class="stars" id="stars"></div>
+  <div class="wrap">
+    <header>
+      <div class="eyebrow">⭐ LWS Tutor Sessions</div>
+      <h1>Let's find your child's <span>starting point</span></h1>
+      <p class="sub">A free, no-pressure conversation with a real tutor — the first step before weekly English sessions begin.</p>
+    </header>
+
+    <div class="starpath" aria-hidden="true">
+      <div class="node"><div class="dot free">1</div><div class="node-label">Placement<br>Free</div></div>
+      <div class="connector"></div>
+      <div class="node"><div class="dot locked">2</div><div class="node-label">Week 1</div></div>
+      <div class="connector"></div>
+      <div class="node"><div class="dot locked">3</div><div class="node-label">Week 2</div></div>
+      <div class="connector"></div>
+      <div class="node"><div class="dot locked">…</div><div class="node-label">8 Weeks</div></div>
+    </div>
+
+    <div class="card">
+      <span class="price-tag">FREE · ONE PER CHILD</span>
+      <h2>Free English Placement Call</h2>
+
+      <ul class="details">
+        <li><span class="icon">🗓️</span><span><b>10–15 minutes</b>, one-on-one over video with your child's tutor</span></li>
+        <li><span class="icon">💬</span><span>A few relaxed conversation prompts — <b>nothing that feels like a test</b></span></li>
+        <li><span class="icon">📋</span><span>A short summary afterward with a <b>recommended level and starting focus</b></span></li>
+        <li><span class="icon">🔓</span><span><b>No commitment</b> — book weekly sessions only if it feels like the right fit</span></li>
+      </ul>
+
+      <p class="fine">Available for ages <b>7–17</b>. Each child gets <b>one free placement call</b>. No prep needed — just show up and chat!</p>
+
+      <a class="cta" href="choose-tutor.html" style="text-decoration:none;">Book Your Free Placement Call →</a>
+      <p class="age-note">Prefer a specific time? You'll pick a slot on the next step.</p>
+    </div>
+  </div>
+
+  <script>
+    const starsEl = document.getElementById('stars');
+    for (let i = 0; i < 40; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = Math.random() * 100 + '%';
+      s.style.top = Math.random() * 100 + '%';
+      s.style.animationDelay = (Math.random() * 3) + 's';
+      starsEl.appendChild(s);
+    }
+  </script>
+</body>
+</html>
