@@ -165,6 +165,7 @@
             child_id: childId || crypto.randomUUID(), // placeholder if not wired to real auth yet
             parent_id: parentId || crypto.randomUUID(),
             parent_email: document.getElementById('parent-email').value.trim(),
+            parent_timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             child_name: document.getElementById('child-name').value.trim(),
             session_type: sessionType,
           }),
